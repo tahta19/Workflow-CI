@@ -3,38 +3,40 @@ name: CI for Model Training
 on:
   push:
     branches:
-      - main  
+      - main  # Workflow ini dijalankan pada push ke branch 'main'
+
 jobs:
   preprocess:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest  # Menjalankan di Ubuntu terbaru
+    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2 
+      uses: actions/checkout@v2  # Mengambil kode dari repositori
 
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8  
+        python-version: 3.8  # Menetapkan versi Python yang digunakan
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pandas numpy scikit-learn mlflow matplotlib seaborn  # Instal dependensi
+        pip install pandas numpy scikit-learn mlflow matplotlib seaborn  # Instal dependensi langsung
 
     - name: Run preprocessing script
-      run: python preprocessing/automate_Nama-siswa.py  
+      run: python preprocessing/automate_Nama-siswa.py  # Menjalankan preprocessing data
 
     - name: Train model
-      run: python modelling.py 
+      run: python modelling.py  # Menjalankan model dengan hyperparameter tuning
 
     - name: List files
-      run: ls -l
+      run: ls -l  # Melihat file yang dihasilkan
 
     - name: Upload model and metrics as artifacts
-      uses: actions/upload-artifact@v3.1.0 
+      uses: actions/upload-artifact@v3.1.2  # Menggunakan versi terbaru v3.1.2
       with:
-        name: model-artifacts 
+        name: model-artifacts  # Nama artefak yang akan disimpan
         path: |
-          best_model  
-          screenshoot_dashboard.jpg 
-          screenshoot_artifak.jpg 
+          best_model  # Menyimpan model yang dilatih
+          screenshoot_dashboard.jpg  # Menyimpan screenshot dashboard
+          screenshoot_artifak.jpg  # Menyimpan screenshot visualisasi
