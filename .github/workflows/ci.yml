@@ -42,7 +42,7 @@ jobs:
 
     - name: Run MLflow Project
       run: |
-        python -m mlflow run ./MLProject --env-manager=local
+        python -m mlflow run ./WORKFLOW-CI/MLProject --env-manager=local
 
     - name: Upload MLflow Artifacts
       uses: actions/upload-artifact@v4
