@@ -11,42 +11,46 @@ jobs:
 
     steps:
     - name: Checkout repo
-      uses: actions/checkout@v4  
+      uses: actions/checkout@v4
 
-    - name: Set up Python 3.8
+    - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.8'
 
-    - name: Check Env
+    - name: Debug environment
       run: |
-        python --version  
-        pip --version  
-        uname -a  
-        pwd 
-        ls -la  
+        python --version
+        pip --version
+        uname -a
+        pwd
+        ls -la
+        echo "=== MLProject folder ==="
+        ls -la MLProject
+        echo "=== MLProject file ==="
+        cat MLProject/MLProject
 
     - name: Install system dependencies
       run: |
-        sudo apt-get update  
-        sudo apt-get install -y build-essential  
+        sudo apt-get update
+        sudo apt-get install -y build-essential
 
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip  
-        pip install mlflow pandas scikit-learn matplotlib seaborn  
+        python -m pip install --upgrade pip
+        pip install mlflow pandas scikit-learn matplotlib seaborn
 
     - name: Set MLflow Tracking URI
       run: |
-        echo "MLFLOW_TRACKING_URI=file:$PWD/mlruns" >> $GITHUB_ENV  
+        echo "MLFLOW_TRACKING_URI=file:$PWD/mlruns" >> $GITHUB_ENV
 
     - name: Run MLflow Project
       run: |
-        python -m mlflow run . --env-manager=local
+        python -m mlflow run ./MLProject --env-manager=local
 
     - name: Upload MLflow Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: mlflow-artifacts  
+        name: mlflow-artifacts
         path: mlruns
         if-no-files-found: warn
