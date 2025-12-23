@@ -1,54 +1,42 @@
-name: MLflow CI
+name: CI for Model Training
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main  # Workflow ini dijalankan pada push ke branch 'main'
 
 jobs:
-  train-model:
-    runs-on: ubuntu-latest
-
+  preprocess:
+    runs-on: ubuntu-latest  # Menjalankan di Ubuntu terbaru
+    
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v2  # Gunakan v2 jika v4 bermasalah
+    - name: Checkout code
+      uses: actions/checkout@v2  # Mengambil kode dari repositori
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v2  # Gunakan v2 jika v5 bermasalah
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: 3.8  # Menetapkan versi Python yang digunakan
 
-    - name: Check Env
+    - name: Install dependencies
       run: |
-        python --version
-        pip --version
-        uname -a
-        pwd
-        ls -la
+        python -m pip install --upgrade pip
+        pip install pandas numpy scikit-learn mlflow matplotlib seaborn  # Instal dependensi langsung
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential
+    - name: Run preprocessing script
+      run: python preprocessing/automate_Nama-siswa.py  # Menjalankan preprocessing data
 
-    - name: Install Python dependencies
-      run: |
-        pip install --upgrade pip
-        pip install mlflow pandas scikit-learn matplotlib seaborn  # Pastikan dependensi sesuai
+    - name: Train model
+      run: python modelling.py  # Menjalankan model dengan hyperparameter tuning
 
-    - name: Set MLflow Tracking URI
-      run: |
-        echo "MLFLOW_TRACKING_URI=file:$PWD/mlruns" >> $GITHUB_ENV
+    - name: List files
+      run: ls -l  # Melihat file yang dihasilkan
 
-    - name: Run MLflow Project
-      run: |
-        python -m mlflow run ./MLProject --env-manager=local
-
-    - name: List mlruns folder content
-      run: ls -la mlruns  # Verifikasi isi mlruns
-
-    - name: Upload MLflow Artifacts
-      uses: actions/upload-artifact@v3  # Menggunakan v3 atau versi terbaru yang tidak deprecated
+    - name: Upload model and metrics as artifacts
+      uses: actions/upload-artifact@v3.1.3  # Gunakan versi terbaru v3.1.3
       with:
-        name: mlflow-artifacts
-        path: mlruns  # Menyimpan seluruh isi folder mlruns sebagai artefak
+        name: model-artifacts  # Nama artefak yang akan disimpan
+        path: |
+          best_model  # Menyimpan model yang dilatih
+          screenshoot_dashboard.jpg  # Menyimpan screenshot dashboard
+          screenshoot_artifak.jpg  # Menyimpan screenshot visualisasi
