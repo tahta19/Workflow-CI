@@ -6,9 +6,21 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
-mlflow.set_experiment("Customer_Segmentation")
+# contoh data dummy (ganti dengan datasetmu)
+X = np.random.rand(100, 4)
 
-mlflow.log_param("n_clusters", 3)
-mlflow.log_metric("silhouette_score", 0.72)
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
-mlflow.sklearn.log_model(model, "model")
+n_clusters = 3
+
+with mlflow.start_run():
+    model = KMeans(n_clusters=n_clusters, random_state=42)
+    model.fit(X_scaled)
+
+    score = silhouette_score(X_scaled, model.labels_)
+
+    mlflow.log_param("n_clusters", n_clusters)
+    mlflow.log_metric("silhouette_score", score)
+
+    mlflow.sklearn.log_model(model, "model")
